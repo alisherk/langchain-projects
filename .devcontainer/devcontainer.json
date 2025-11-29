@@ -1,0 +1,53 @@
+{
+    "name": "langchain-app",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "."
+    },
+    "runArgs": [
+        "--name", "langchain-app"
+    ],
+    "overrideCommand": true,
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/workspace,type=bind,consistency=cached",
+    "workspaceFolder": "/home/vscode/workspace",
+    "remoteUser": "vscode",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "charliermarsh.ruff",
+                "humao.rest-client",
+                "ms-python.debugpy",
+                "ms-python.vscode-pylance",
+                "github.copilot",
+                "github.copilot-chat"
+            ],
+            "settings": {
+                "window.title": "${activeEditorShort}${separator}${rootName}${separator}${profileName}",
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.organizeImports": "always",
+                    "source.fixAll.ruff": "explicit"
+                },
+                "[python]": {
+                    "editor.defaultFormatter": "charliermarsh.ruff",
+                    "editor.formatOnSave": true,
+                    "editor.codeActionsOnSave": {
+                        "source.fixAll.ruff": "explicit",
+                        "source.organizeImports.ruff": "explicit"
+                    }
+                },
+                "ruff.enable": true,
+                "ruff.lint.enable": true,
+                "ruff.format.enable": true,
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash"
+                    }
+                }
+            }
+        }
+    },
+    "postStartCommand": ".devcontainer/post-start.sh"
+}
