@@ -2,11 +2,10 @@ from functools import lru_cache
 
 from pydantic_settings import BaseSettings
 
-
 class Settings(BaseSettings):
     openai_api_key: str = ""
     text_embedding_model: str = ""
-    model: str = "gpt-4o-mini"
+    model: str = "gpt-4o"
 
     class Config:
         env_file = ".env"
