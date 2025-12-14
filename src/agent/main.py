@@ -1,11 +1,9 @@
-import langchain
 from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
 
-from src.agent.sql import run_sqlite_query, list_tables
+from src.agent.sql import run_sqlite_query, list_tables,write_file
 from src.settings import get_settings
 
-langchain.verbose = True
 settings = get_settings()
 
 # 1. Create the language model
@@ -18,11 +16,10 @@ model = ChatOpenAI(
 )
 
 # 2. Create the list of tools
-tools = [list_tables, run_sqlite_query]
-
+tools = [list_tables, run_sqlite_query, write_file]
 
 # 3. Create the agent with a simple system prompt string
-system_prompt = "You are an AI that has access to a SQLite database. You have access to the following tools: list_tables and run_sqlite_query."
+system_prompt = "You are an AI that has access to a SQLite database. You have access to the following tools: list_tables, run_sqlite_query, and write_file."
 
 # 4. Create the agent
 agent = create_agent(
@@ -32,11 +29,17 @@ agent = create_agent(
 )
 
 # 5. Define a function to ask questions to the agent
+conversation_history = []
 def ask(question: str) -> str:
-    result = agent.invoke({"messages": [{"role": "user", "content": question}]})
+    conversation_history.append({"role": "user", "content": question})
+    result = agent.invoke({"messages": conversation_history})
+    conversation_history.append({"role": "assistant", "content": result["messages"][-1].content})
     return result["messages"][-1].content
 
 
 # 6. Now you can use it simply:
-answer = ask("Summarize top 5 most popular products and create a html report and save as a file report.html.")
-print(answer)
+task1 = ask("Summarize top 5 most popular products and create a html report and save as a file report.html at src/agent path.")
+print(task1)
+
+task2 = ask("given our report.html file, can you extract the table and give me the top 3 products with highest sales?")
+print(task2)
