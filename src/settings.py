@@ -6,6 +6,15 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     text_embedding_model: str = ""
     model: str = "gpt-4o"
+    secret_key = "123"
+    sqlalchemy_database_uri = "sqlite:///sqlite.db"
+    upload_url = "https://prod-upload-langchain.fly.dev"
+    redis_url: str = ""
+    pinecone_api_key: str = ""
+    pinecone_env_name: str = ""
+    pinecone_index_name: str = ""
+    langfuse_public_key: str = ""
+    langfuse_secret_key: str = ""
 
     class Config:
         env_file = ".env"
