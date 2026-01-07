@@ -10,7 +10,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_openai import ChatOpenAI
 
-from src.settings import get_settings
+from src.pdf.app.settings import get_settings
 
 
 class SimpleChatHistory(BaseChatMessageHistory):

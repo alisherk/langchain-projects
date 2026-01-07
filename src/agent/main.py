@@ -5,7 +5,7 @@ from langchain_core.callbacks import BaseCallbackHandler
 from langchain_openai import ChatOpenAI
 
 from src.agent.sql import list_tables, run_sqlite_query, write_file
-from src.settings import get_settings
+from src.pdf.app.settings import get_settings
 
 
 # Custom callback handler for detailed output

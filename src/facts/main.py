@@ -3,7 +3,7 @@ from langchain_text_splitters import CharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 
-from src.settings import get_settings
+from src.pdf.app.settings import get_settings
 
 settings = get_settings()
 

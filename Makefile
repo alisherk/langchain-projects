@@ -8,13 +8,13 @@ help:
 	@echo "  make redis      - Run Redis server"
 
 init-db:
-	flask --app src.pdf.app.web init-db
+	cd src/pdf && .venv/bin/flask --app app.web init-db
 
 dev:
-	inv dev
+	cd src/pdf && APP_ENV=development ../../.venv/bin/flask --app app.web run --debug --port 8000
 
 devworker:
-	inv devworker
+	cd src/pdf && APP_ENV=development ../../.venv/bin/watchmedo auto-restart --directory=./app --pattern=*.py --recursive -- ../../.venv/bin/celery -A app.celery.worker worker --concurrency=1 --loglevel=INFO --pool=solo
 
 redis:
 	redis-server

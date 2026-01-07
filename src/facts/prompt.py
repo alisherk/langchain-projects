@@ -3,7 +3,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from src.settings import get_settings
+from src.pdf.app.settings import get_settings
 from src.facts.filter_retriever import FilterRetriever
 
 settings = get_settings()

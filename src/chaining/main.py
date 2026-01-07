@@ -1,7 +1,7 @@
 from langchain_core.prompts import PromptTemplate
 from openai import OpenAI
 
-from src.settings import get_settings
+from src.pdf.app.settings import get_settings
 
 settings = get_settings()
 client = OpenAI(api_key=settings.openai_api_key)
