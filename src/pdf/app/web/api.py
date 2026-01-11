@@ -1,8 +1,9 @@
 from typing import Dict
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+
 from app.web.db import db
 from app.web.db.models import Message
 from app.web.db.models.conversation import Conversation
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 
 def get_messages_by_conversation_id(
@@ -18,7 +19,7 @@ def get_messages_by_conversation_id(
     messages = (
         db.session.query(Message)
         .filter_by(conversation_id=conversation_id)
-        .order_by(Message.created_on.desc())
+        .order_by(Message.created_on.asc())
     )
     return [message.as_lc_message() for message in messages]
 

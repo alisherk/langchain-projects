@@ -16,5 +16,3 @@ dev:
 devworker:
 	cd src/pdf && APP_ENV=development ../../.venv/bin/watchmedo auto-restart --directory=./app --pattern=*.py --recursive -- ../../.venv/bin/celery -A app.celery.worker worker --concurrency=1 --loglevel=INFO --pool=solo
 
-redis:
-	redis-server

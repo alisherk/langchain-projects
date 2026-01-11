@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/home/vscode/workspace:cached
+    command: sleep infinity
+    networks:
+      - dev-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=password
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - dev-network
+
+volumes:
+  rabbitmq-data:
+
+networks:
+  dev-network:
+    driver: bridge

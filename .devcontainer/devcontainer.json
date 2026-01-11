@@ -1,16 +1,20 @@
 {
     "name": "langchain-app",
-    "build": {
-        "dockerfile": "Dockerfile",
-        "context": "."
-    },
-    "runArgs": [
-        "--name", "langchain-app"
-    ],
-    "overrideCommand": true,
-    "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/workspace,type=bind,consistency=cached",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
     "workspaceFolder": "/home/vscode/workspace",
     "remoteUser": "vscode",
+    "forwardPorts": [5672, 15672],
+    "portsAttributes": {
+        "5672": {
+            "label": "RabbitMQ AMQP",
+            "onAutoForward": "notify"
+        },
+        "15672": {
+            "label": "RabbitMQ Management",
+            "onAutoForward": "openBrowser"
+        }
+    },
     "customizations": {
         "vscode": {
             "extensions": [

@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 from celery import Celery
-from celery import Celery, Task
+from celery import Task
 
 
 def celery_init_app(app: Flask) -> Celery:
