@@ -6,7 +6,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
-
 # Build a RAG (Retrieval-Augmented Generation) chain with conversation history
 #
 # Flow when invoked:
@@ -62,3 +61,18 @@ def build_chat(chat_args: ChatArgs):
     )
 
     return chain_with_history
+
+"""
+in the end our prompt looks like this:
+System: You are a helpful assistant. Use the following context to answer the user's question:
+System: You are a helpful assistant. Use the following context...
+
+chunk 1. <text from relevant PDF in pinecone>
+
+chunk 2. <more text from relevant PDF in pinecone>
+
+chunk 3. <more text from relevant PDF in pinecone>
+
+History: [past messages]
+Human: What is X?
+"""

@@ -51,7 +51,6 @@ def create_message(conversation):
     config = {"configurable": {"session_id": conversation.id}}
 
     if streaming:
-
         def generate():
             for chunk in chat.stream({"input": input}, config=config):
                 yield chunk
