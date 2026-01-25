@@ -8,7 +8,7 @@ help:
 	@echo "  make redis      - Run Redis server"
 
 init-db:
-	cd src/pdf && .venv/bin/flask --app app.web init-db
+	cd src/pdf && ../../.venv/bin/flask --app app.web init-db
 
 dev:
 	cd src/pdf && APP_ENV=development ../../.venv/bin/flask --app app.web run --debug --port 8000
