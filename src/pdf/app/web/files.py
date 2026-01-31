@@ -1,8 +1,9 @@
 import json
 import os
-import requests
 import tempfile
-from typing import Tuple, Dict, Any
+from typing import Dict, Tuple
+
+import requests
 from app.web.config import Config
 
 upload_url = f"{Config.UPLOAD_URL}/upload"
@@ -31,6 +32,10 @@ class _Download:
     def download(self):
         self.file_path = os.path.join(self.temp_dir.name, self.file_id)
         response = requests.get(create_download_url(self.file_id), stream=True)
+
+        # Check if the request was successful
+        response.raise_for_status()
+
         with open(self.file_path, "wb") as file:
             for chunk in response.iter_content(chunk_size=8192):
                 file.write(chunk)

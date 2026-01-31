@@ -1,3 +1,4 @@
+from functools import partial
 from app.chat.embeddings.openai import embeddings
 from app.chat.models import ChatArgs
 from langchain_pinecone import PineconeVectorStore
@@ -13,7 +14,13 @@ index = pc.Index(settings.pinecone_index_name)
 
 vectorstore = PineconeVectorStore(index=index, embedding=embeddings)
 
-def build_retriever(chat_args: ChatArgs):
-    search_kwargs = {"filter": { "pdf_id": chat_args.pdf_id }}
+def build_retriever(chat_args: ChatArgs, k: int) -> PineconeVectorStore.as_retriever:
+    search_kwargs = {"filter": { "pdf_id": chat_args.pdf_id }, "k": k}
 
     return vectorstore.as_retriever(search_kwargs=search_kwargs)
+
+retriever_registry = {
+    "pinecone_2": partial(build_retriever, k=2),
+    "pinecone_4": partial(build_retriever, k=4),
+    "pinecone_6": partial(build_retriever, k=6),
+}

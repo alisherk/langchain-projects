@@ -1,10 +1,12 @@
-from app.chat.llms.chatopenai import build_llm
+from app.chat.llms.chatopenai import llm_registry
 from app.chat.memories.sql_memory import get_sql_session_history
 from app.chat.models import ChatArgs
-from app.chat.vector_stores.pinecone import build_retriever
+from app.chat.vector_stores.pinecone import retriever_registry
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
+from app.web.api import set_conversation_components, get_conversation_components
+import random
 
 # Build a RAG (Retrieval-Augmented Generation) chain with conversation history
 #
@@ -21,9 +23,32 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 #       {"input": "What is this about?"},
 #       config={"configurable": {"session_id": conversation_id}}
 #   )
+
+def select_component(component_registry, chat_args: ChatArgs, component_type: str):
+    components = get_conversation_components(chat_args.conversation_id)
+    previous_component = components[component_type]
+
+    if previous_component: 
+        component = component_registry[previous_component](chat_args)
+        return previous_component, component
+    else:
+        random_component_name = random.choice(list(component_registry.keys()))
+        component = component_registry[random_component_name](chat_args)
+        return random_component_name, component
+
 def build_chat(chat_args: ChatArgs):
-    retriever = build_retriever(chat_args)
-    llm = build_llm(chat_args)
+    retriever_name, retriever = select_component(retriever_registry, chat_args, "retriever")
+
+    llm_name, llm = select_component(llm_registry, chat_args, "llm")
+
+    print(f"Using LLM: {llm_name}, Retriever: {retriever_name}")
+
+    set_conversation_components(
+        conversation_id=chat_args.conversation_id,
+        llm=llm_name,
+        retriever=retriever_name, 
+        memory="sql_memory",
+    )
 
     # Create a RAG prompt with message history
     prompt = ChatPromptTemplate.from_messages(
