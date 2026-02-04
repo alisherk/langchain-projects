@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     secret_key: str = "123"
     sqlalchemy_database_uri: str = "sqlite:///sqlite.db"
     upload_url: str = "https://prod-upload-langchain.fly.dev"
-    redis_url: str = ""
+    redis_uri: str = ""
     pinecone_api_key: str = ""
     pinecone_env_name: str = ""
     pinecone_index_name: str = ""

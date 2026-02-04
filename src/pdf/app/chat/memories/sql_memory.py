@@ -22,7 +22,16 @@ class SQLMessageHistory(BaseChatMessageHistory):
         pass
 
 
-def get_sql_session_history(conversation_id: str) -> SQLMessageHistory:
-    # Note: This store should be module-level or persistent,
-    # otherwise it resets on every function call
-    return SQLMessageHistory(conversation_id=conversation_id)
+def build_sql_memory(chat_args):
+    """Returns SQL session history function for RunnableWithMessageHistory."""
+
+    def get_session_history(conversation_id: str) -> SQLMessageHistory:
+        return SQLMessageHistory(conversation_id=conversation_id)
+
+    return get_session_history
+
+
+# SQL memory registry
+sql_memory_registry = {
+    "sql_memory": build_sql_memory,
+}

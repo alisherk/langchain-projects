@@ -1,12 +1,12 @@
 from app.chat.llms.chatopenai import llm_registry
-from app.chat.memories.sql_memory import get_sql_session_history
+from app.chat.memories.memory_registry import memory_registry
 from app.chat.models import ChatArgs
+from app.chat.score import get_random_component_by_score
 from app.chat.vector_stores.pinecone import retriever_registry
+from app.web.api import get_conversation_components, set_conversation_components
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from app.web.api import set_conversation_components, get_conversation_components
-import random
 
 # Build a RAG (Retrieval-Augmented Generation) chain with conversation history
 #
@@ -24,30 +24,49 @@ import random
 #       config={"configurable": {"session_id": conversation_id}}
 #   )
 
+
 def select_component(component_registry, chat_args: ChatArgs, component_type: str):
     components = get_conversation_components(chat_args.conversation_id)
     previous_component = components[component_type]
 
-    if previous_component: 
+    if previous_component:
         component = component_registry[previous_component](chat_args)
         return previous_component, component
     else:
-        random_component_name = random.choice(list(component_registry.keys()))
+        random_component_name = get_random_component_by_score(
+            component_registry, component_type
+        )
         component = component_registry[random_component_name](chat_args)
         return random_component_name, component
 
+
 def build_chat(chat_args: ChatArgs):
-    retriever_name, retriever = select_component(retriever_registry, chat_args, "retriever")
+    retriever_name, retriever = select_component(
+        retriever_registry, chat_args, "retriever"
+    )
 
     llm_name, llm = select_component(llm_registry, chat_args, "llm")
 
-    print(f"Using LLM: {llm_name}, Retriever: {retriever_name}")
+    memory_name, memory = select_component(memory_registry, chat_args, "memory")
+
+    print(f"Using LLM: {llm_name}, Retriever: {retriever_name}, Memory: {memory_name}")
+
+    # Print message history for debugging
+    try:
+        history = memory(str(chat_args.conversation_id))
+        messages = history.messages
+        print(f"\n=== Message History (Conversation {chat_args.conversation_id}) ===")
+        for i, msg in enumerate(messages):
+            print(f"{i + 1}. [{msg.type}]: {msg.content}")
+        print(f"=== Total messages: {len(messages)} ===\n")
+    except Exception as e:
+        print(f"Could not load history: {e}")
 
     set_conversation_components(
         conversation_id=chat_args.conversation_id,
         llm=llm_name,
-        retriever=retriever_name, 
-        memory="sql_memory",
+        retriever=retriever_name,
+        memory=memory_name,
     )
 
     # Create a RAG prompt with message history
@@ -68,9 +87,13 @@ def build_chat(chat_args: ChatArgs):
 
     rag_chain = (
         {
-            "context": lambda x: format_docs(retriever.invoke(x["input"])), # retrieve relevant docs from pinecone and format as text
-            "input": lambda x: x["input"], # pass through user input
-            "history": lambda x: x.get("history", []), # load past messages from SQL memory
+            "context": lambda x: format_docs(
+                retriever.invoke(x["input"])
+            ),  # retrieve relevant docs from pinecone and format as text
+            "input": lambda x: x["input"],  # pass through user input
+            "history": lambda x: x.get(
+                "history", []
+            ),  # load past messages from SQL memory
         }
         | prompt
         | llm
@@ -80,12 +103,13 @@ def build_chat(chat_args: ChatArgs):
     # Wrap the RAG chain with message history
     chain_with_history = RunnableWithMessageHistory(
         runnable=rag_chain,
-        get_session_history=get_sql_session_history,
+        get_session_history=memory,
         input_messages_key="input",
         history_messages_key="history",
     )
 
     return chain_with_history
+
 
 """
 in the end our prompt looks like this:

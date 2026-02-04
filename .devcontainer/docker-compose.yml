@@ -23,6 +23,23 @@ services:
       - rabbitmq-data:/var/lib/rabbitmq
     networks:
       - dev-network
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - dev-network
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    networks:
+      - dev-network
+    depends_on:
+      - redis
 
 volumes:
   rabbitmq-data:
